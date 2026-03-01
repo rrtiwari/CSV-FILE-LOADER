@@ -14,7 +14,7 @@ const CsvUploader = () => {
   const fetchTableData = async (currentPage, searchQuery = "") => {
     try {
       const response = await fetch(
-        `http://localhost:5000/api/data?page=${currentPage}&limit=50&search=${encodeURIComponent(searchQuery)}`,
+        `https://csv-file-loader.onrender.com/api/data?page=${currentPage}&limit=50&search=${encodeURIComponent(searchQuery)}`,
       );
       const result = await response.json();
       setCsvData(result.data);
@@ -41,7 +41,7 @@ const CsvUploader = () => {
     formData.append("file", file);
 
     try {
-      const response = await fetch("http://localhost:5000/api/upload", {
+      const response = await fetch("https://csv-file-loader.onrender.com/api/upload", {
         method: "POST",
         body: formData,
       });
