@@ -17,10 +17,17 @@ const CsvUploader = () => {
         `https://csv-file-loader.onrender.com/api/data?page=${currentPage}&limit=50&search=${encodeURIComponent(searchQuery)}`,
       );
       const result = await response.json();
-      setCsvData(result.data);
-      setTotalPages(result.totalPages);
+
+      if (response.ok && result.data) {
+        setCsvData(result.data);
+        setTotalPages(result.totalPages);
+      } else {
+        setCsvData([]);
+        setTotalPages(1);
+      }
     } catch (error) {
-      console.error(error);
+      setCsvData([]);
+      setTotalPages(1);
     }
   };
 
@@ -41,10 +48,13 @@ const CsvUploader = () => {
     formData.append("file", file);
 
     try {
-      const response = await fetch("https://csv-file-loader.onrender.com/api/upload", {
-        method: "POST",
-        body: formData,
-      });
+      const response = await fetch(
+        "https://csv-file-loader.onrender.com/api/upload",
+        {
+          method: "POST",
+          body: formData,
+        },
+      );
       const data = await response.json();
 
       if (response.ok) {
