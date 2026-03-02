@@ -76,4 +76,13 @@ const getCsvData = async (req, res) => {
   }
 };
 
-module.exports = { uploadCsv, getCsvData };
+const clearCsvData = async (req, res) => {
+  try {
+    await CsvData.deleteMany({});
+    res.json({ message: "All database records successfully cleared" });
+  } catch (error) {
+    res.status(500).json({ error: "Failed to clear database" });
+  }
+};
+
+module.exports = { uploadCsv, getCsvData, clearCsvData };

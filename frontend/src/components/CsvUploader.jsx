@@ -73,6 +73,43 @@ const CsvUploader = () => {
     }
   };
 
+  const handleClearData = async () => {
+    if (
+      !window.confirm(
+        "Are you sure you want to delete all records? This cannot be undone.",
+      )
+    )
+      return;
+
+    setLoading(true);
+    setMessage("");
+
+    try {
+      const response = await fetch(
+        "https://csv-file-loader.onrender.com/api/clear",
+        {
+          method: "DELETE",
+        },
+      );
+      const data = await response.json();
+
+      if (response.ok) {
+        setMessage(data.message);
+        setCsvData([]);
+        setTotalPages(1);
+        setPage(1);
+        setActiveSearch("");
+        setSearchTerm("");
+      } else {
+        setMessage(data.error || "Clear failed");
+      }
+    } catch (error) {
+      setMessage("Server error during clear");
+    } finally {
+      setLoading(false);
+    }
+  };
+
   const handleSearch = () => {
     setPage(1);
     setActiveSearch(searchTerm);
@@ -90,25 +127,33 @@ const CsvUploader = () => {
 
   return (
     <div className="app-container">
-      <div className="upload-section">
-        <input
-          type="file"
-          accept=".csv"
-          className="file-input"
-          onChange={handleFileChange}
-        />
+      <div className="header-actions">
+        <div className="upload-section" style={{ marginBottom: 0 }}>
+          <input
+            type="file"
+            accept=".csv"
+            className="file-input"
+            onChange={handleFileChange}
+          />
+          <button
+            className="upload-button"
+            onClick={handleUpload}
+            disabled={loading}
+          >
+            {loading ? "Processing..." : "Upload and Show"}
+          </button>
+        </div>
+
         <button
-          className="upload-button"
-          onClick={handleUpload}
-          disabled={loading}
+          className="clear-button"
+          onClick={handleClearData}
+          disabled={loading || csvData.length === 0}
         >
-          {loading ? "Uploading..." : "Upload and Show"}
+          Clear All Data
         </button>
       </div>
 
-      {message && <div className="status-message">{message}</div>}
-
-      <div className="search-section">
+      <div className="search-section" style={{ marginTop: "20px" }}>
         <input
           type="text"
           placeholder="Search records..."
@@ -122,9 +167,15 @@ const CsvUploader = () => {
         </button>
       </div>
 
+      {message && (
+        <div className="status-message" style={{ marginTop: "20px" }}>
+          {message}
+        </div>
+      )}
+
       {csvData.length > 0 && (
         <>
-          <div className="table-container">
+          <div className="table-container" style={{ marginTop: "20px" }}>
             <table className="csv-table">
               <thead>
                 <tr>
